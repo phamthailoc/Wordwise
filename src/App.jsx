@@ -171,6 +171,7 @@ function App() {
       setShowForm(false);
       setCategory("All");
       setQuery("");
+      setView("All");
       setWords((existing) => [
         result,
         ...existing.filter((item) => item.id !== result.id),
