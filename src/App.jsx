@@ -97,18 +97,17 @@ export default function App() {
           <>
             {page === "home" && (
               <section className="home-page">
-                <p className="eyebrow">TOEIC VOCABULARY</p>
+                <p className="eyebrow">GÓC HỌC TẬP</p>
                 <h1>Mỗi ngày, nhớ thêm một chút.</h1>
                 <p>
-                  Chọn Flashcards để tự ôn hoặc Auto Review để nghe và lật thẻ
-                  tự động.
+                  Chọn Flashcards để tự ôn hoặc Auto Review để nghe và lật thẻ tự động.
                 </p>
                 <button
                   className="primary-button"
                   disabled={!words.length || !!error}
                   onClick={() => setMode("choose")}
                 >
-                  Start learning →
+                  Bắt đầu học →
                 </button>
                 {!words.length && !error && (
                   <p>Thêm từ trong trang Từ vựng để bắt đầu.</p>
@@ -116,10 +115,7 @@ export default function App() {
               </section>
             )}
             {page === "vocabulary" && (
-              <VocabularyPage
-                words={words}
-                onChange={() => loadWords()}
-              />
+              <VocabularyPage words={words} onChange={() => loadWords()} />
             )}
             {page === "statistics" && (
               <StatisticsPage words={words} knownIds={knownIds} />
@@ -139,8 +135,8 @@ export default function App() {
         <Flashcard
           words={manualWords}
           initialWord={initialWord}
-          onClose={() => setMode(null)}
           onMarkKnown={markKnown}
+          onClose={() => setMode(null)}
         />
       )}
       {mode === "auto" && (

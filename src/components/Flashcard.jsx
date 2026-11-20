@@ -1,3 +1,4 @@
+import { categoryLabel, partOfSpeechLabels } from "../constants/vocabulary.js";
 import ExampleSentences from "./ExampleSentences.jsx";
 import { useState } from "react";
 import Icon from "./Icon.jsx";
@@ -25,10 +26,10 @@ export default function Flashcard({
   }
 
   return (
-    <Modal className="flashcard" title="Vocabulary flashcard" onClose={onClose}>
+    <Modal className="flashcard" title="Flashcards" onClose={onClose}>
       <header className="flashcard-header">
         <div className="flash-top">
-          <span>YOUR FLASHCARD</span>
+          <span>FLASHCARDS</span>
           <span>
             {index + 1} / {words.length}
           </span>
@@ -36,7 +37,7 @@ export default function Flashcard({
         <button
           className="modal-close"
           onClick={onClose}
-          aria-label="Close flashcard"
+          aria-label="Đóng thẻ từ"
         >
           <Icon name="close" />
         </button>
@@ -45,16 +46,16 @@ export default function Flashcard({
         ✳
       </div>
       <div className="flash-category">
-        {word.category} · {word.partOfSpeech}
+        {categoryLabel(word.category)} · {partOfSpeechLabels[word.partOfSpeech]}
       </div>
       {!isFlipped ? (
         <>
           <h2>{word.word}</h2>
           <p className="flash-pronunciation">
-            Recall the meaning, then reveal the answer.
+            Thử nhớ nghĩa trước khi xem đáp án.
           </p>
           <button className="flip-button" onClick={() => setIsFlipped(true)}>
-            Reveal meaning ↗
+            Xem nghĩa ↗
           </button>
         </>
       ) : (
@@ -63,7 +64,7 @@ export default function Flashcard({
           <RelatedWords relatedWords={word.relatedWords} />
           <ExampleSentences examples={word.examples} className="example-box" />
           <button className="flip-button" onClick={() => setIsFlipped(false)}>
-            Show the word again ↗
+            Xem lại từ ↗
           </button>
         </>
       )}
@@ -74,10 +75,10 @@ export default function Flashcard({
             nextWord();
           }}
         >
-          <Icon name="check" size={17} /> I know this
+          <Icon name="check" size={17} /> Đã nhớ
         </button>
         <button onClick={nextWord}>
-          Next word <Icon name="arrow" size={17} />
+          Từ tiếp theo <Icon name="arrow" size={17} />
         </button>
       </div>
     </Modal>

@@ -414,7 +414,6 @@ td {
 }
 .review-chip {
   font-size: 14px;
-  text-transform: capitalize;
 }
 .review-chip.selected {
   background: #e7efdf;

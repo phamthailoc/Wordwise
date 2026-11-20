@@ -46,7 +46,7 @@ export default function AddWordMenu({ onAdd, onImport }) {
       {open && (
         <div id="add-word-options" className="add-word-options">
           <button onClick={() => choose(onAdd)}>Nhập thủ công</button>
-          <button onClick={() => choose(onImport)}>Import JSON</button>
+          <button onClick={() => choose(onImport)}>Nhập danh sách</button>
         </div>
       )}
     </div>

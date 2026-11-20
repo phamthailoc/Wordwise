@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { createVocabulary, updateVocabulary } from "../api/vocabulary.js";
-import { categories, partOfSpeechOptions } from "../constants/vocabulary.js";
+import {
+  categories,
+  partOfSpeechOptions,
+  partOfSpeechLabels,
+  categoryLabel,
+} from "../constants/vocabulary.js";
 import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
 
@@ -72,38 +77,38 @@ export default function AddWordForm({
   return (
     <Modal
       className="word-form"
-      title={initialWord ? "Edit word" : "Add a word"}
+      title={initialWord ? "Sửa từ vựng" : "Thêm từ vựng"}
       onClose={onClose}
     >
       <button
         className="modal-close"
         onClick={onClose}
-        aria-label="Close add word form"
+        aria-label="Đóng biểu mẫu từ vựng"
       >
         <Icon name="close" />
       </button>
       <h2>{initialWord ? "Sửa từ vựng" : "Thêm từ vựng"}</h2>
       <form onSubmit={submitWord}>
         <label>
-          English word
+          Từ tiếng Anh
           <input
             name="word"
             required
             maxLength={100}
             value={form.word}
             onChange={updateField}
-            placeholder="e.g. purchase"
+            placeholder="Ví dụ: purchase"
           />
         </label>
         <label>
-          Vietnamese meaning
+          Nghĩa tiếng Việt
           <input
             name="meaning"
             required
             maxLength={255}
             value={form.meaning}
             onChange={updateField}
-            placeholder="e.g. mua hàng"
+            placeholder="Ví dụ: mua hàng"
           />
         </label>
         <div className="example-fields">
@@ -149,7 +154,7 @@ export default function AddWordForm({
           </button>
         </div>
         <label>
-          Category (optional)
+          Chủ đề (không bắt buộc)
           <select
             value={
               customCategory
@@ -167,38 +172,40 @@ export default function AddWordForm({
             <option value="">Chưa phân loại</option>
             {categoryOptions.map((category) => (
               <option key={category} value={category}>
-                {category}
+                {categoryLabel(category)}
               </option>
             ))}
-            <option value="__new__">Nhập category mới…</option>
+            <option value="__new__">Nhập chủ đề mới…</option>
           </select>
         </label>
         {customCategory && (
           <label>
-            Category mới (optional)
+            Chủ đề mới (không bắt buộc)
             <input
               name="category"
               maxLength={60}
               value={form.category}
               onChange={updateField}
-              placeholder="Nhập tên category mới"
+              placeholder="Nhập tên chủ đề mới"
             />
           </label>
         )}
         <label>
-          Part of speech
+          Loại từ
           <select
             name="partOfSpeech"
             value={form.partOfSpeech}
             onChange={updateField}
           >
             {partOfSpeechOptions.map((part) => (
-              <option key={part}>{part}</option>
+              <option key={part} value={part}>
+                {partOfSpeechLabels[part]}
+              </option>
             ))}
           </select>
         </label>
         <label>
-          Synonyms (optional, comma separated)
+          Từ đồng nghĩa (không bắt buộc, cách nhau bằng dấu phẩy)
           <input
             name="synonyms"
             value={form.synonyms}
@@ -207,7 +214,7 @@ export default function AddWordForm({
           />
         </label>
         <label>
-          Antonyms (optional, comma separated)
+          Từ trái nghĩa (không bắt buộc, cách nhau bằng dấu phẩy)
           <input
             name="antonyms"
             value={form.antonyms}
@@ -225,7 +232,7 @@ export default function AddWordForm({
           disabled={saving}
           type="submit"
         >
-          {saving ? "Saving…" : "Save to my words"}
+          {saving ? "Đang lưu…" : "Lưu từ"}
           <Icon name="arrow" size={18} />
         </button>
       </form>

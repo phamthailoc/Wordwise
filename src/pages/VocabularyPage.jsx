@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { deleteVocabulary } from "../api/vocabulary.js";
-import { partOfSpeechOptions } from "../constants/vocabulary.js";
+import {
+  partOfSpeechOptions,
+  partOfSpeechLabels,
+  categoryLabel,
+} from "../constants/vocabulary.js";
 import AddWordForm from "../components/AddWordForm.jsx";
 import ImportWordsForm from "../components/ImportWordsForm.jsx";
 import AddWordMenu from "../components/AddWordMenu.jsx";
@@ -66,14 +70,16 @@ export default function VocabularyPage({ words, onChange }) {
           />
         </label>
         <label>
-          Category
+          Chủ đề
           <select
             value={topic}
             onChange={(event) => setTopic(event.target.value)}
           >
-            <option value="all">Tất cả category</option>
+            <option value="all">Tất cả chủ đề</option>
             {topics.map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>
+                {categoryLabel(item)}
+              </option>
             ))}
           </select>
         </label>
@@ -85,7 +91,9 @@ export default function VocabularyPage({ words, onChange }) {
           >
             <option value="all">Tất cả loại từ</option>
             {partOfSpeechOptions.map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>
+                {partOfSpeechLabels[item]}
+              </option>
             ))}
           </select>
         </label>
@@ -112,10 +120,13 @@ export default function VocabularyPage({ words, onChange }) {
           <article className="vocabulary-row" key={word.id}>
             <div>
               <h2>
-                {word.word} <small>{word.partOfSpeech}</small>
+                {word.word}{" "}
+                <small>
+                  {partOfSpeechLabels[word.partOfSpeech] || word.partOfSpeech}
+                </small>
               </h2>
               <p>{word.meaning}</p>
-              <span className="muted">{word.category}</span>
+              <span className="muted">{categoryLabel(word.category)}</span>
             </div>
             <div className="row-actions">
               {deleteId === word.id ? (

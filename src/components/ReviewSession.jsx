@@ -1,3 +1,4 @@
+import { categoryLabel, partOfSpeechLabels } from "../constants/vocabulary.js";
 import ExampleSentences from "./ExampleSentences.jsx";
 import RelatedWords from "./RelatedWords.jsx";
 import { speakWord } from "../utils/review.js";
@@ -18,14 +19,14 @@ export default function ReviewSession({
   return (
     <div className="review-session">
       <div className="review-session-meta">
-        <span>ROUND {round}</span>
+        <span>LƯỢT {round}</span>
         <span>
           {index + 1} / {queue.length}
         </span>
       </div>
       {isPaused && (
         <p className="review-paused" role="status">
-          Paused — the timer is stopped.
+          Đã tạm dừng
         </p>
       )}
       <div className="review-progress">
@@ -37,8 +38,8 @@ export default function ReviewSession({
       </div>
       <div className={`review-card-face ${isFlipped ? "answer-face" : ""}`}>
         <div className="review-card-tags">
-          <span>{activeCard.category}</span>
-          <span>{activeCard.partOfSpeech}</span>
+          <span>{categoryLabel(activeCard.category)}</span>
+          <span>{partOfSpeechLabels[activeCard.partOfSpeech]}</span>
         </div>
         {!isFlipped ? (
           <>
@@ -48,13 +49,13 @@ export default function ReviewSession({
               onClick={() => speakWord(activeCard.word)}
               disabled={!speechSupported}
             >
-              🔊 Play pronunciation
+              🔊 Nghe phát âm
             </button>
             <p className="review-hint">
-              Listen, recall the meaning, then let the card flip.
+              Nghe và thử nhớ nghĩa trước khi thẻ tự lật.
             </p>
             <button className="flip-button" onClick={flipNow}>
-              Flip now <span>↗</span>
+              Xem nghĩa <span>↗</span>
             </button>
           </>
         ) : (
@@ -63,18 +64,18 @@ export default function ReviewSession({
             <RelatedWords relatedWords={activeCard.relatedWords} />
             <ExampleSentences examples={activeCard.examples} className="review-example" />
             <div className="review-rating">
-              <button onClick={() => rateCard("known")}>✓ I knew it</button>
-              <button onClick={() => rateCard("again")}>↻ Review again</button>
+              <button onClick={() => rateCard("known")}>✓ Đã nhớ</button>
+              <button onClick={() => rateCard("again")}>↻ Cần ôn</button>
             </div>
             <p className="review-hint">
-              No choice? This word will be included in the next round.
+              Chưa chọn? Từ này sẽ được đưa vào lượt ôn tiếp theo.
             </p>
           </>
         )}
       </div>
       <div className="review-session-actions">
-        <button onClick={togglePause}>{isPaused ? "Continue" : "Pause"}</button>
-        <button onClick={stopReview}>End review</button>
+        <button onClick={togglePause}>{isPaused ? "Tiếp tục" : "Tạm dừng"}</button>
+        <button onClick={stopReview}>Kết thúc</button>
       </div>
     </div>
   );

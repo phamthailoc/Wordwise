@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
+import { categoryLabel } from "../constants/vocabulary.js";
 import { importVocabulary } from "../api/vocabulary.js";
 import {
   MAX_IMPORT_WORDS,
@@ -13,7 +14,10 @@ const sample = JSON.stringify(
       meaning: "mua",
       partOfSpeech: "verb",
       category: "Office",
-      examples: ["The company plans to purchase new computers.", "You can purchase tickets online."],
+      examples: [
+        "The company plans to purchase new computers.",
+        "You can purchase tickets online.",
+      ],
       synonyms: ["buy", "acquire"],
       antonyms: ["sell"],
     },
@@ -110,18 +114,23 @@ export default function ImportWordsForm({ existingWords, onClose, onSave }) {
           <details>
             <summary>Hướng dẫn & mẫu nhập</summary>
             <p>
-              Tối đa {MAX_IMPORT_WORDS} từ mỗi lượt. Từ trùng được bỏ qua, không ghi đè dữ liệu cũ.
+              Tối đa {MAX_IMPORT_WORDS} từ mỗi lượt. Từ trùng được bỏ qua, không
+              ghi đè dữ liệu cũ.
             </p>
             <p>
-              Bắt buộc: word, meaning, partOfSpeech. Optional: category, examples, synonyms, antonyms.
+              Bắt buộc: word (từ), meaning (nghĩa), partOfSpeech (loại từ).
+              Không bắt buộc: category (chủ đề), examples (mảng câu ví dụ),
+              synonyms (đồng nghĩa), antonyms (trái nghĩa).
             </p>
             <p>
-              Mỗi từ dùng category trong JSON. Category mới được lưu cùng từ; bỏ trống thì dùng Chưa phân loại.
+              Mỗi từ có thể có chủ đề riêng trong trường category. Chủ đề mới
+              được lưu cùng từ; bỏ trống thì dùng Chưa phân loại.
             </p>
             <pre>{sample}</pre>
             <p>
-              partOfSpeech: noun, verb, adjective, adverb hoặc phrase. Không có
-              từ liên quan thì dùng [].
+              Giá trị partOfSpeech: noun (danh từ), verb (động từ), adjective
+              (tính từ), adverb (trạng từ) hoặc phrase (cụm từ). Không có từ
+              liên quan thì dùng [].
             </p>
           </details>
           <button disabled={saving} onClick={preview}>
@@ -154,7 +163,7 @@ export default function ImportWordsForm({ existingWords, onClose, onSave }) {
                 <tr>
                   <th>#</th>
                   <th>Từ</th>
-                  <th>Category</th>
+                  <th>Chủ đề</th>
                   <th>Kết quả</th>
                 </tr>
               </thead>
@@ -164,12 +173,14 @@ export default function ImportWordsForm({ existingWords, onClose, onSave }) {
                     <td>{row.number}</td>
                     <td>{row.word || "—"}</td>
                     <td>
-                      {row.data?.category ||
-                        (typeof parsedWords[row.number - 1]?.category ===
-                        "string"
-                          ? parsedWords[row.number - 1].category.trim() ||
-                            "Chưa phân loại"
-                          : "Chưa phân loại")}
+                      {categoryLabel(
+                        row.data?.category ||
+                          (typeof parsedWords[row.number - 1]?.category ===
+                          "string"
+                            ? parsedWords[row.number - 1].category.trim() ||
+                              "Chưa phân loại"
+                            : "Chưa phân loại"),
+                      )}
                     </td>
                     <td className={row.status === "error" ? "form-error" : ""}>
                       {row.status === "added" ? "Đã thêm" : row.message}
