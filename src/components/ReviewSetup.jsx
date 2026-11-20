@@ -1,12 +1,8 @@
-import {
-  partOfSpeechOptions,
-  partOfSpeechLabels,
-  categoryLabel,
-} from "../constants/vocabulary.js";
 import { isValidReviewTime } from "../utils/review.js";
 
 export default function ReviewSetup({
   availableTopics,
+  availableParts,
   selectedTopics,
   setSelectedTopics,
   selectedParts,
@@ -60,7 +56,7 @@ export default function ReviewSetup({
               }
               onClick={() => toggleTopic(topic)}
             >
-              {categoryLabel(topic)}
+              {topic}
             </button>
           ))}
         </div>
@@ -72,19 +68,19 @@ export default function ReviewSetup({
             type="button"
             onClick={() =>
               setSelectedParts(
-                selectedParts.length === partOfSpeechOptions.length
+                selectedParts.length === availableParts.length
                   ? []
-                  : partOfSpeechOptions,
+                  : availableParts,
               )
             }
           >
-            {selectedParts.length === partOfSpeechOptions.length
+            {selectedParts.length === availableParts.length
               ? "Bỏ chọn tất cả"
               : "Chọn tất cả"}
           </button>
         </div>
         <div className="review-chip-list">
-          {partOfSpeechOptions.map((value) => (
+          {availableParts.map((value) => (
             <button
               type="button"
               key={value}
@@ -96,7 +92,7 @@ export default function ReviewSetup({
               }
               onClick={() => togglePart(value)}
             >
-              {partOfSpeechLabels[value]}
+              {value}
             </button>
           ))}
         </div>

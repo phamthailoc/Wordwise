@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Modal from "./Modal.jsx";
-import { categoryLabel } from "../constants/vocabulary.js";
 import { importVocabulary } from "../api/vocabulary.js";
 import {
   MAX_IMPORT_WORDS,
@@ -173,14 +172,12 @@ export default function ImportWordsForm({ existingWords, onClose, onSave }) {
                     <td>{row.number}</td>
                     <td>{row.word || "—"}</td>
                     <td>
-                      {categoryLabel(
-                        row.data?.category ||
-                          (typeof parsedWords[row.number - 1]?.category ===
-                          "string"
-                            ? parsedWords[row.number - 1].category.trim() ||
-                              "Chưa phân loại"
-                            : "Chưa phân loại"),
-                      )}
+                      {row.data?.category ||
+                        (typeof parsedWords[row.number - 1]?.category ===
+                        "string"
+                          ? parsedWords[row.number - 1].category.trim() ||
+                            "Chưa phân loại"
+                          : "Chưa phân loại")}
                     </td>
                     <td className={row.status === "error" ? "form-error" : ""}>
                       {row.status === "added" ? "Đã thêm" : row.message}

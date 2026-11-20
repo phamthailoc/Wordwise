@@ -1,5 +1,3 @@
-import { categoryLabel } from "../constants/vocabulary.js";
-
 export default function StatisticsPage({ words, knownIds }) {
   const knownCount = words.filter((word) => knownIds.includes(word.id)).length;
   const topics = [...new Set(words.map((word) => word.category))].sort();
@@ -35,7 +33,7 @@ export default function StatisticsPage({ words, knownIds }) {
         <tbody>
           {topics.map((topic) => (
             <tr key={topic}>
-              <td>{categoryLabel(topic)}</td>
+              <td>{topic}</td>
               <td>{words.filter((word) => word.category === topic).length}</td>
             </tr>
           ))}
