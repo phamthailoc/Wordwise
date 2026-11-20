@@ -1,3 +1,6 @@
+-- Thiết lập database hiện tại và nạp 30 từ mẫu; không ghi đè từ đã có.
+BEGIN;
+
 CREATE TABLE IF NOT EXISTS vocabulary (
   id BIGSERIAL PRIMARY KEY,
   word VARCHAR(100) NOT NULL UNIQUE,
@@ -7,10 +10,6 @@ CREATE TABLE IF NOT EXISTS vocabulary (
   related_words JSONB NOT NULL DEFAULT '{"synonyms": [], "antonyms": []}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
-ALTER TABLE vocabulary
-  ADD COLUMN IF NOT EXISTS part_of_speech VARCHAR(30) NOT NULL DEFAULT 'noun',
-  ADD COLUMN IF NOT EXISTS related_words JSONB NOT NULL DEFAULT '{"synonyms": [], "antonyms": []}'::jsonb;
 
 CREATE TABLE IF NOT EXISTS vocabulary_examples (
   id BIGSERIAL PRIMARY KEY,
@@ -60,3 +59,5 @@ WITH seed (word, meaning, sentence, category, part_of_speech, related_words) AS 
 )
 INSERT INTO vocabulary_examples (vocabulary_id, sentence, position)
 SELECT inserted.id, seed.sentence, 1 FROM inserted JOIN seed USING (word);
+
+COMMIT;
