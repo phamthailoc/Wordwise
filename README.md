@@ -1,28 +1,31 @@
 # Wordwise
 
-A vocabulary learning app for building and reviewing an English word collection through flashcards, automated review, and continuous listening.
+Ứng dụng học từ vựng tiếng Anh với thẻ từ, ôn tập tự động và luyện nghe theo nhóm. Người học có thể tự xây dựng kho từ và chọn cách ôn phù hợp.
 
-**React + Vite | JavaScript | Node.js + Express | PostgreSQL**
+**React + Vite · JavaScript · Node.js + Express · PostgreSQL**
 
-## Features
+## Tính năng chính
 
-- **Flashcards:** reveal meanings at your own pace, replay pronunciation, and move between words.
-- **Auto Review:** filter by category and word type, set card timing, and repeat words marked for review.
-- **WordFlow:** listen to shuffled words in groups with adjustable group size and reading speed. Each word finishes before the next begins.
-- **Vocabulary library:** create, edit, delete, search, and filter words; preview JSON imports of up to 100 words and skip duplicates.
-- **Word details:** store multiple example sentences, synonyms, and antonyms; view library counts and words remembered during the current session.
+- **Flashcards:** tự lật thẻ, nghe phát âm và chuyển sang từ tiếp theo.
+- **Auto Review:** chọn chủ đề, loại từ và thời gian hiển thị; ôn tiếp các từ chưa nhớ sau mỗi lượt.
+- **WordFlow:** nghe và xem nghĩa theo nhóm; tùy chỉnh số từ và tốc độ đọc, tự chuyển sau khi đọc xong mỗi từ.
+- **Quản lý từ vựng:** thêm, sửa, xóa, tìm kiếm, lọc và nhập danh sách JSON tối đa 100 từ mỗi lượt.
+- **Thông tin từ và thống kê:** nhiều câu ví dụ, đồng nghĩa, trái nghĩa, số từ theo chủ đề và số từ đã nhớ trong phiên.
 
-## Run locally
+## Chạy trên máy
 
-Requires **Node.js 18+**, **PostgreSQL**, and the PostgreSQL `createdb`/`psql` commands on PATH.
-Run these commands from the repository root:
+Cần cài **Node.js 18+** và **PostgreSQL**. Có thể thiết lập database bằng pgAdmin 4 hoặc dòng lệnh.
 
-```sh
+### 1. Cài thư viện và tạo cấu hình
+
+Mở terminal tại thư mục dự án. Với PowerShell trên Windows:
+
+```powershell
 npm install
-cp .env.example .env
+Copy-Item .env.example .env
 ```
 
-Fill in `.env` with your local settings. Keep real credentials out of Git:
+Điền thông tin PostgreSQL trên máy vào `.env`:
 
 ```env
 PORT=4000
@@ -30,49 +33,62 @@ DATABASE_URL=postgresql://<USER>:<PASSWORD>@localhost:5432/english_learning
 CLIENT_ORIGIN=http://localhost:5173
 ```
 
-For a **new database**, create it and load the schema and 30 sample words:
+Thay `<USER>` và `<PASSWORD>` bằng tài khoản của bạn; chỉnh host, port và tên database nếu khác. `.env` chứa thông tin local và không được đưa lên Git. `.env.example` chỉ giữ ba biến rỗng.
 
-```sh
+### 2. Tạo database và nạp dữ liệu mẫu
+
+Thư mục `database` chỉ có **`schema.sql`**, gồm cấu trúc hiện tại và 30 từ mẫu.
+
+Nếu đã thêm công cụ PostgreSQL vào PATH, chạy:
+
+```powershell
 createdb -U postgres english_learning
 psql -U postgres -d english_learning -f database/schema.sql
+```
+
+Dùng tài khoản và thông tin kết nối khớp với `DATABASE_URL`. Với pgAdmin 4: tạo database `english_learning`, mở **Query Tool** của database đó, mở file `database/schema.sql` và chạy. Xem [hướng dẫn chi tiết](docs/guide.md).
+
+Nếu database đang dùng đã có hai bảng `vocabulary` và `vocabulary_examples` theo cấu trúc hiện tại, có thể dùng tiếp. File SQL không xóa hoặc ghi đè từ đã có khi chạy lại trên cấu trúc này.
+
+### 3. Khởi động ứng dụng
+
+```powershell
 npm run dev
 ```
 
-Use your PostgreSQL username and connection settings for both commands and `DATABASE_URL`.
-Open [localhost:5173](http://localhost:5173). The API runs on port 4000.
+Mở [http://localhost:5173](http://localhost:5173). Backend mặc định chạy tại `http://localhost:4000`.
 
-**Already have the old database?** Keep it, skip schema/seed setup, and run
-`npm run db:migrate:examples` before `npm run dev`. This preserves existing words and moves their sentences into the examples table. See the [setup and data guide](docs/guide.md).
+## Kiến trúc và cấu trúc code
 
-## Architecture
+Ứng dụng theo mô hình Client–Server. Backend tổ chức theo **Route → Controller → Model**.
 
 ```text
-React UI -> API requests -> Express Route -> Controller -> Model -> PostgreSQL
+React → Gọi API → Express Route → Controller → Model → PostgreSQL
 
-src/pages/          Vocabulary management and statistics
-src/components/     Forms, dialogs, and the shared VocabularyCard
-src/AutoReview.jsx  Timed review and repeat rounds
-src/WordFlow.jsx    Sequential speech and group playback
-src/api/            HTTP requests
-shared/             Input validation shared by client and server
-server/             Routes, controllers, models, and database connection
-database/          Schema, sample data, and migrations
+src/pages/          Trang quản lý từ vựng và thống kê
+src/components/     Form, hộp thoại và thẻ VocabularyCard dùng chung
+src/AutoReview.jsx  Điều khiển ôn tự động và các lượt ôn tiếp
+src/WordFlow.jsx    Điều khiển đọc nối tiếp theo nhóm
+src/api/            Gửi yêu cầu đến backend
+shared/             Kiểm tra dữ liệu dùng chung cho client và server
+server/             Route, controller, model và kết nối database
+database/schema.sql Cấu trúc database hiện tại và dữ liệu mẫu
 ```
 
-`vocabulary` has many `vocabulary_examples`. Sentences retain their order and are deleted with their word. Saving a word and its examples uses a database transaction.
+Một từ trong `vocabulary` có nhiều câu trong `vocabulary_examples`. Các câu được giữ đúng thứ tự, lưu cùng từ trong một transaction và tự xóa khi từ bị xóa.
 
-## Validation
+## Kiểm tra
 
-```sh
+```powershell
 npm run build
 ```
 
-Manual checks: create a word with multiple examples, search for it, reveal its meaning, reload, edit its examples, and delete it. Also check Auto Review repeat rounds, WordFlow pause/resume, and the mobile layout. These are manual checks, not an automated test suite.
+Luồng kiểm tra thủ công: thêm từ có nhiều ví dụ → tìm từ → xem nghĩa → tải lại trang → sửa ví dụ → xóa từ. Kiểm tra thêm vòng ôn tiếp của Auto Review, phát âm và tạm dừng của WordFlow, bố cục màn hình nhỏ. Dự án chưa có bộ kiểm thử tự động.
 
-## Status
+## Trạng thái dự án
 
-Local development; **not deployed yet**. Vocabulary changes persist in PostgreSQL. Remembered-word progress is session-only and resets on reload. Pronunciation uses the browser's Web Speech API; available voices depend on the browser and device.
+Dự án đang chạy local, **chưa deploy**. Từ vựng được lưu trong PostgreSQL; tiến độ đã nhớ chỉ giữ trong phiên và mất khi tải lại trang. Phát âm dùng Web Speech API, giọng đọc phụ thuộc trình duyệt và thiết bị.
 
-Development uses `feature/* -> dev -> main`. Release and hosting configuration will be finalized before deployment.
+Quy trình Git: `feature/* → dev → main`. Phát hành được thực hiện sau khi hoàn thiện tính năng và kiểm tra.
 
-[API, import format, migrations, and code walkthrough](docs/guide.md)
+[Hướng dẫn database, API, mẫu import và cách đọc code](docs/guide.md)
