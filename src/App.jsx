@@ -3,6 +3,7 @@ import { getVocabulary } from "./api/vocabulary.js";
 import LearningModes from "./components/LearningModes.jsx";
 import Flashcard from "./components/Flashcard.jsx";
 import AutoReview from "./AutoReview.jsx";
+import WordFlow from "./WordFlow.jsx";
 import VocabularyPage from "./pages/VocabularyPage.jsx";
 import StatisticsPage from "./pages/StatisticsPage.jsx";
 
@@ -100,7 +101,8 @@ export default function App() {
                 <p className="eyebrow">GÓC HỌC TẬP</p>
                 <h1>Mỗi ngày, nhớ thêm một chút.</h1>
                 <p>
-                  Chọn Flashcards để tự ôn hoặc Auto Review để nghe và lật thẻ tự động.
+                  Chọn cách học phù hợp: Flashcards, Auto Review hoặc nghe theo
+                  nhóm với WordFlow.
                 </p>
                 <button
                   className="primary-button"
@@ -129,6 +131,7 @@ export default function App() {
           onClose={() => setMode(null)}
           onChooseFlashcards={() => openFlashcards(words)}
           onChooseAutoReview={() => setMode("auto")}
+          onChooseWordFlow={() => setMode("flow")}
         />
       )}
       {mode === "flashcards" && (
@@ -145,6 +148,9 @@ export default function App() {
           onClose={() => setMode(null)}
           onMarkKnown={markKnown}
         />
+      )}
+      {mode === "flow" && (
+        <WordFlow words={words} onClose={() => setMode(null)} />
       )}
     </>
   );

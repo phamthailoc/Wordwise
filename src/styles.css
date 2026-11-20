@@ -656,3 +656,32 @@ td {
   gap: 8px;
   overflow-wrap: anywhere;
 }
+
+.word-flow-setup {
+  display: grid;
+  gap: 20px;
+}
+.flow-word-list {
+  list-style: none;
+  margin: 20px 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.flow-word-list li {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #dce2d7;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.flow-word-list li[aria-current="true"] {
+  background: #e7efdf;
+  border-color: #406333;
+  box-shadow: inset 4px 0 #406333;
+}
+.word-flow .review-summary > button {
+  margin: 6px;
+}

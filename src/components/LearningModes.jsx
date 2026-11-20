@@ -5,6 +5,7 @@ export default function LearningModes({
   wordCount,
   onChooseFlashcards,
   onChooseAutoReview,
+  onChooseWordFlow,
   onClose,
 }) {
   return (
@@ -49,7 +50,20 @@ export default function LearningModes({
           </span>
           <Icon name="arrow" size={18} />
         </button>
-
+        <button
+          className="learning-mode-option"
+          disabled={wordCount === 0}
+          onClick={onChooseWordFlow}
+        >
+          <Icon name="arrow" size={25} />
+          <span>
+            <b>WordFlow</b>
+            <small>
+              Nghe và nhìn từng nhóm từ. Đọc hết nhóm rồi tự chuyển tiếp.
+            </small>
+          </span>
+          <Icon name="arrow" size={18} />
+        </button>
       </div>
     </Modal>
   );
