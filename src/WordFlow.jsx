@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Modal from "./components/Modal.jsx";
 import { shuffle } from "./utils/review.js";
-import {
-  partOfSpeechOptions,
-  partOfSpeechLabels,
-  categoryLabel,
-} from "./constants/vocabulary.js";
 
 function isPositiveInteger(value) {
   return Number.isSafeInteger(Number(value)) && Number(value) > 0;
@@ -23,8 +18,11 @@ const readingSpeeds = [
 
 export default function WordFlow({ words, onClose }) {
   const categories = [...new Set(words.map((word) => word.category))].sort();
+  const availableTypes = [
+    ...new Set(words.map((word) => word.partOfSpeech)),
+  ].sort();
   const [selectedCategories, setSelectedCategories] = useState(categories);
-  const [selectedTypes, setSelectedTypes] = useState(partOfSpeechOptions);
+  const [selectedTypes, setSelectedTypes] = useState(availableTypes);
   const [groupSize, setGroupSize] = useState(6);
   const [rate, setRate] = useState(0.9);
   const [phase, setPhase] = useState("setup");
@@ -150,7 +148,7 @@ export default function WordFlow({ words, onClose }) {
                   }
                   onClick={() => toggleCategory(category)}
                 >
-                  {categoryLabel(category)}
+                  {category}
                 </button>
               ))}
             </div>
@@ -162,19 +160,19 @@ export default function WordFlow({ words, onClose }) {
                 type="button"
                 onClick={() =>
                   setSelectedTypes(
-                    selectedTypes.length === partOfSpeechOptions.length
+                    selectedTypes.length === availableTypes.length
                       ? []
-                      : partOfSpeechOptions,
+                      : availableTypes,
                   )
                 }
               >
-                {selectedTypes.length === partOfSpeechOptions.length
+                {selectedTypes.length === availableTypes.length
                   ? "Bỏ chọn tất cả"
                   : "Chọn tất cả"}
               </button>
             </div>
             <div className="review-chip-list">
-              {partOfSpeechOptions.map((type) => (
+              {availableTypes.map((type) => (
                 <button
                   type="button"
                   key={type}
@@ -192,7 +190,7 @@ export default function WordFlow({ words, onClose }) {
                     )
                   }
                 >
-                  {partOfSpeechLabels[type]}
+                  {type}
                 </button>
               ))}
             </div>

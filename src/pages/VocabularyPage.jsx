@@ -1,10 +1,5 @@
 import { useState } from "react";
 import { deleteVocabulary } from "../api/vocabulary.js";
-import {
-  partOfSpeechOptions,
-  partOfSpeechLabels,
-  categoryLabel,
-} from "../constants/vocabulary.js";
 import AddWordForm from "../components/AddWordForm.jsx";
 import ImportWordsForm from "../components/ImportWordsForm.jsx";
 import AddWordMenu from "../components/AddWordMenu.jsx";
@@ -20,6 +15,9 @@ export default function VocabularyPage({ words, onChange }) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const topics = [...new Set(words.map((word) => word.category))].sort();
+  const availableParts = [
+    ...new Set(words.map((word) => word.partOfSpeech)),
+  ].sort();
   const filteredWords = words.filter((word) => {
     const matches = `${word.word} ${word.meaning}`
       .toLowerCase()
@@ -78,7 +76,7 @@ export default function VocabularyPage({ words, onChange }) {
             <option value="all">Tất cả chủ đề</option>
             {topics.map((item) => (
               <option key={item} value={item}>
-                {categoryLabel(item)}
+                {item}
               </option>
             ))}
           </select>
@@ -90,9 +88,9 @@ export default function VocabularyPage({ words, onChange }) {
             onChange={(event) => setPart(event.target.value)}
           >
             <option value="all">Tất cả loại từ</option>
-            {partOfSpeechOptions.map((item) => (
+            {availableParts.map((item) => (
               <option key={item} value={item}>
-                {partOfSpeechLabels[item]}
+                {item}
               </option>
             ))}
           </select>
@@ -120,13 +118,10 @@ export default function VocabularyPage({ words, onChange }) {
           <article className="vocabulary-row" key={word.id}>
             <div>
               <h2>
-                {word.word}{" "}
-                <small>
-                  {partOfSpeechLabels[word.partOfSpeech] || word.partOfSpeech}
-                </small>
+                {word.word} <small>{word.partOfSpeech}</small>
               </h2>
               <p>{word.meaning}</p>
-              <span className="muted">{categoryLabel(word.category)}</span>
+              <span className="muted">{word.category}</span>
             </div>
             <div className="row-actions">
               {deleteId === word.id ? (

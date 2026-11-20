@@ -1,7 +1,6 @@
 import RelatedWords from "./RelatedWords.jsx";
 import ExampleSentences from "./ExampleSentences.jsx";
 import { speakWord } from "../utils/review.js";
-import { partOfSpeechLabels } from "../constants/vocabulary.js";
 
 // Shared presentation; each study mode controls when to flip or move on.
 export default function VocabularyCard({ word, isFlipped }) {
@@ -33,9 +32,7 @@ export default function VocabularyCard({ word, isFlipped }) {
                 🔊
               </button>
             </div>
-            <div className="review-word-type">
-              {partOfSpeechLabels[word.partOfSpeech] || word.partOfSpeech}
-            </div>
+            <div className="review-word-type">{word.partOfSpeech}</div>
             {isBack && (
               <>
                 <div className="review-meaning">{word.meaning}</div>

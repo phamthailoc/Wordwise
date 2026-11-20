@@ -1,11 +1,6 @@
+import { partOfSpeechOptions } from "../constants/vocabulary.js";
 import { useState } from "react";
 import { createVocabulary, updateVocabulary } from "../api/vocabulary.js";
-import {
-  categories,
-  partOfSpeechOptions,
-  partOfSpeechLabels,
-  categoryLabel,
-} from "../constants/vocabulary.js";
 import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
 
@@ -35,11 +30,7 @@ export default function AddWordForm({
   const [saving, setSaving] = useState(false);
   const [customCategory, setCustomCategory] = useState(false);
   const categoryOptions = [
-    ...new Set([
-      ...categories.slice(1),
-      ...suggestedCategories,
-      initialWord?.category,
-    ]),
+    ...new Set([...suggestedCategories, initialWord?.category]),
   ]
     .filter((category) => category && category !== "Chưa phân loại")
     .sort();
@@ -172,7 +163,7 @@ export default function AddWordForm({
             <option value="">Chưa phân loại</option>
             {categoryOptions.map((category) => (
               <option key={category} value={category}>
-                {categoryLabel(category)}
+                {category}
               </option>
             ))}
             <option value="__new__">Nhập chủ đề mới…</option>
@@ -199,7 +190,7 @@ export default function AddWordForm({
           >
             {partOfSpeechOptions.map((part) => (
               <option key={part} value={part}>
-                {partOfSpeechLabels[part]}
+                {part}
               </option>
             ))}
           </select>

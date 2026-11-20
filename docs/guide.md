@@ -77,7 +77,7 @@ Mỗi lượt nhận 1–100 từ, body tối đa 1 MB. Từ trùng được so 
 - **Auto Review:** trộn toàn bộ từ khớp bộ lọc; thời gian mặc định trước/sau khi lật là 3/6 giây. Từ chưa đánh dấu hoặc chọn cần ôn sẽ vào lượt tiếp theo. App chờ người học bấm ôn tiếp. Tạm dừng giữ thời gian còn lại.
 - **WordFlow:** trộn từ khớp bộ lọc; số từ mỗi nhóm mặc định là 6, cho nhập số nguyên dương. Tốc độ có sẵn: 0.5×, 0.75×, 0.9×, 1×, 1.25×, 1.5×, 2×. Đọc xong mới sang từ tiếp; hết nhóm chuyển ngay, hết danh sách tự dừng. Tiếp tục sau khi tạm dừng sẽ đọc lại từ hiện tại. Không cập nhật số từ đã nhớ.
 
-Giao diện dùng tiếng Việt; giữ tên sản phẩm và chế độ học bằng tiếng Anh. Việc dịch nhãn chủ đề/loại từ không thay đổi giá trị lưu trong database.
+Giao diện dùng tiếng Việt; giữ tên sản phẩm và chế độ học bằng tiếng Anh. Tên chủ đề và loại từ hiển thị nguyên giá trị nhận từ database, không qua bảng dịch. Bộ lọc và thiết lập ôn tập chỉ liệt kê các giá trị đang có trong kho từ. Form thêm/sửa vẫn cho chọn các loại từ được API hỗ trợ và nhập chủ đề mới.
 
 ## Cách đọc code
 

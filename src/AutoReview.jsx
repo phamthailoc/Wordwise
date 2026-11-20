@@ -4,16 +4,19 @@ import ReviewSession from "./components/ReviewSession.jsx";
 import ReviewSummary from "./components/ReviewSummary.jsx";
 import { shuffle, speakWord, isValidReviewTime } from "./utils/review.js";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { partOfSpeechOptions } from "./constants/vocabulary.js";
 
 function AutoReview({ words, onClose, onMarkKnown }) {
   const availableTopics = useMemo(
     () => [...new Set(words.map((word) => word.category))].sort(),
     [words],
   );
+  const availableParts = useMemo(
+    () => [...new Set(words.map((word) => word.partOfSpeech))].sort(),
+    [words],
+  );
   const [phase, setPhase] = useState("setup");
   const [selectedTopics, setSelectedTopics] = useState(availableTopics);
-  const [selectedParts, setSelectedParts] = useState(partOfSpeechOptions);
+  const [selectedParts, setSelectedParts] = useState(availableParts);
   const [frontSeconds, setFrontSeconds] = useState(3);
   const [backSeconds, setBackSeconds] = useState(6);
   const [queue, setQueue] = useState([]);
@@ -206,6 +209,7 @@ function AutoReview({ words, onClose, onMarkKnown }) {
       {phase === "setup" && (
         <ReviewSetup
           availableTopics={availableTopics}
+          availableParts={availableParts}
           selectedTopics={selectedTopics}
           setSelectedTopics={setSelectedTopics}
           selectedParts={selectedParts}
