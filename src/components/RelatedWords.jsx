@@ -7,13 +7,13 @@ export default function RelatedWords({ relatedWords = {} }) {
     <div className="related-words">
       {synonyms.length > 0 && (
         <div>
-          <b>Synonyms</b>
+          <b>Đồng nghĩa</b>
           <span>{synonyms.join(", ")}</span>
         </div>
       )}
       {antonyms.length > 0 && (
         <div>
-          <b>Antonyms</b>
+          <b>Trái nghĩa</b>
           <span>{antonyms.join(", ")}</span>
         </div>
       )}

@@ -4,6 +4,7 @@ import ReviewSession from "./components/ReviewSession.jsx";
 import ReviewSummary from "./components/ReviewSummary.jsx";
 import { shuffle, speakWord, isValidReviewTime } from "./utils/review.js";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { partOfSpeechOptions } from "./constants/vocabulary.js";
 
 function AutoReview({ words, onClose, onMarkKnown }) {
   const availableTopics = useMemo(
@@ -12,10 +13,9 @@ function AutoReview({ words, onClose, onMarkKnown }) {
   );
   const [phase, setPhase] = useState("setup");
   const [selectedTopics, setSelectedTopics] = useState(availableTopics);
-  const [selectedParts, setSelectedParts] = useState(["all"]);
+  const [selectedParts, setSelectedParts] = useState(partOfSpeechOptions);
   const [frontSeconds, setFrontSeconds] = useState(3);
-  const [backSeconds, setBackSeconds] = useState(5);
-  const [cardLimit, setCardLimit] = useState("all");
+  const [backSeconds, setBackSeconds] = useState(6);
   const [queue, setQueue] = useState([]);
   const [pendingCards, setPendingCards] = useState([]);
   const [index, setIndex] = useState(0);
@@ -35,8 +35,7 @@ function AutoReview({ words, onClose, onMarkKnown }) {
       words.filter(
         (word) =>
           selectedTopics.includes(word.category) &&
-          (selectedParts.includes("all") ||
-            selectedParts.includes(word.partOfSpeech)),
+          selectedParts.includes(word.partOfSpeech),
       ),
     [words, selectedTopics, selectedParts],
   );
@@ -50,29 +49,19 @@ function AutoReview({ words, onClose, onMarkKnown }) {
   }
 
   function togglePart(part) {
-    setSelectedParts((selected) => {
-      if (part === "all") return ["all"];
-      const current = selected.filter((item) => item !== "all");
-      const next = current.includes(part)
-        ? current.filter((item) => item !== part)
-        : [...current, part];
-      return next.length === 0 ? ["all"] : next;
-    });
+    setSelectedParts((selected) =>
+      selected.includes(part)
+        ? selected.filter((item) => item !== part)
+        : [...selected, part],
+    );
   }
 
   function startRound(cards, nextRound = 1) {
     if (!cards.length) {
-      setSetupError(
-        "No words match these filters yet. Choose another topic or word type.",
-      );
+      setSetupError("Không có từ phù hợp. Hãy chọn chủ đề hoặc loại từ khác.");
       return;
     }
-    const shuffled = shuffle(cards);
-    const limitedCards =
-      nextRound > 1 || cardLimit === "all"
-        ? shuffled
-        : shuffled.slice(0, Number(cardLimit));
-    setQueue(limitedCards);
+    setQueue(shuffle(cards));
     setPendingCards([]);
     setIndex(0);
     setRound(nextRound);
@@ -185,22 +174,34 @@ function AutoReview({ words, onClose, onMarkKnown }) {
 
   const title =
     phase === "setup"
-      ? "Set up Auto Review"
+      ? "Thiết lập Auto Review"
       : phase === "review"
         ? "Auto Review"
-        : "Round complete";
+        : "Hoàn thành lượt ôn";
 
   return (
-    <Modal className="auto-review-dialog" title={title} onClose={stopReview}>
+    <Modal
+      className={`auto-review-dialog ${phase === "review" ? "study-dialog" : ""}`}
+      title={title}
+      onClose={stopReview}
+    >
       <button
         className="modal-close"
         onClick={stopReview}
-        aria-label="Close Auto Review"
+        aria-label="Đóng ôn tự động"
       >
         ×
       </button>
-      <div className="eyebrow">TOEIC VOCABULARY</div>
-      <h2>{title}</h2>
+      {phase === "review" ? (
+        <header className="study-header">
+          <h2>{title}</h2>
+          <span>
+            Lượt {round} · {index + 1}/{queue.length}
+          </span>
+        </header>
+      ) : (
+        <h2>{title}</h2>
+      )}
 
       {phase === "setup" && (
         <ReviewSetup
@@ -215,8 +216,6 @@ function AutoReview({ words, onClose, onMarkKnown }) {
           setFrontSeconds={setFrontSeconds}
           backSeconds={backSeconds}
           setBackSeconds={setBackSeconds}
-          cardLimit={cardLimit}
-          setCardLimit={setCardLimit}
           setupError={setupError}
           speechSupported={speechSupported}
           startSelectedReview={startSelectedReview}
@@ -227,16 +226,11 @@ function AutoReview({ words, onClose, onMarkKnown }) {
       {phase === "review" && activeCard && (
         <ReviewSession
           activeCard={activeCard}
-          round={round}
-          index={index}
-          queue={queue}
           isFlipped={isFlipped}
-          speechSupported={speechSupported}
           flipNow={flipNow}
           rateCard={rateCard}
           togglePause={togglePause}
           isPaused={isPaused}
-          stopReview={stopReview}
         />
       )}
 

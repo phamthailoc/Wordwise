@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { createVocabulary, updateVocabulary } from "../api/vocabulary.js";
-import { categories, partOfSpeechOptions } from "../constants/vocabulary.js";
+import {
+  categories,
+  partOfSpeechOptions,
+  partOfSpeechLabels,
+  categoryLabel,
+} from "../constants/vocabulary.js";
 import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
 
@@ -20,7 +25,7 @@ export default function AddWordForm({
   const [form, setForm] = useState({
     word: initialWord?.word || "",
     meaning: initialWord?.meaning || "",
-    example: initialWord?.example || "",
+    examples: initialWord?.examples?.length ? initialWord.examples : [""],
     category: initialWord?.category || "",
     partOfSpeech: initialWord?.partOfSpeech || "noun",
     synonyms: initialWord?.relatedWords?.synonyms?.join(", ") || "",
@@ -51,7 +56,7 @@ export default function AddWordForm({
       const payload = {
         word: form.word,
         meaning: form.meaning,
-        example: form.example,
+        examples: form.examples.map((text) => text.trim()).filter(Boolean),
         category: form.category,
         partOfSpeech: form.partOfSpeech,
         relatedWords: {
@@ -72,51 +77,84 @@ export default function AddWordForm({
   return (
     <Modal
       className="word-form"
-      title={initialWord ? "Edit word" : "Add a word"}
+      title={initialWord ? "Sửa từ vựng" : "Thêm từ vựng"}
       onClose={onClose}
     >
       <button
         className="modal-close"
         onClick={onClose}
-        aria-label="Close add word form"
+        aria-label="Đóng biểu mẫu từ vựng"
       >
         <Icon name="close" />
       </button>
       <h2>{initialWord ? "Sửa từ vựng" : "Thêm từ vựng"}</h2>
       <form onSubmit={submitWord}>
         <label>
-          English word
+          Từ tiếng Anh
           <input
             name="word"
             required
             maxLength={100}
             value={form.word}
             onChange={updateField}
-            placeholder="e.g. purchase"
+            placeholder="Ví dụ: purchase"
           />
         </label>
         <label>
-          Vietnamese meaning
+          Nghĩa tiếng Việt
           <input
             name="meaning"
             required
             maxLength={255}
             value={form.meaning}
             onChange={updateField}
-            placeholder="e.g. mua hàng"
+            placeholder="Ví dụ: mua hàng"
           />
         </label>
+        <div className="example-fields">
+          <span>Câu ví dụ (không bắt buộc)</span>
+          {form.examples.map((sentence, index) => (
+            <div className="example-field" key={index}>
+              <input
+                aria-label={`Câu ví dụ ${index + 1}`}
+                value={sentence}
+                onChange={(event) =>
+                  setForm({
+                    ...form,
+                    examples: form.examples.map((text, position) =>
+                      position === index ? event.target.value : text,
+                    ),
+                  })
+                }
+                placeholder="Nhập câu ví dụ tiếng Anh…"
+              />
+              <button
+                type="button"
+                aria-label={`Xóa ví dụ ${index + 1}`}
+                onClick={() =>
+                  setForm({
+                    ...form,
+                    examples: form.examples.filter(
+                      (_, position) => position !== index,
+                    ),
+                  })
+                }
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setForm({ ...form, examples: [...form.examples, ""] })
+            }
+          >
+            + Thêm ví dụ
+          </button>
+        </div>
         <label>
-          Example sentence (optional)
-          <input
-            name="example"
-            value={form.example}
-            onChange={updateField}
-            placeholder="A sentence that brings it to life..."
-          />
-        </label>
-        <label>
-          Category (optional)
+          Chủ đề (không bắt buộc)
           <select
             value={
               customCategory
@@ -134,38 +172,40 @@ export default function AddWordForm({
             <option value="">Chưa phân loại</option>
             {categoryOptions.map((category) => (
               <option key={category} value={category}>
-                {category}
+                {categoryLabel(category)}
               </option>
             ))}
-            <option value="__new__">Nhập category mới…</option>
+            <option value="__new__">Nhập chủ đề mới…</option>
           </select>
         </label>
         {customCategory && (
           <label>
-            Category mới (optional)
+            Chủ đề mới (không bắt buộc)
             <input
               name="category"
               maxLength={60}
               value={form.category}
               onChange={updateField}
-              placeholder="Nhập tên category mới"
+              placeholder="Nhập tên chủ đề mới"
             />
           </label>
         )}
         <label>
-          Part of speech
+          Loại từ
           <select
             name="partOfSpeech"
             value={form.partOfSpeech}
             onChange={updateField}
           >
             {partOfSpeechOptions.map((part) => (
-              <option key={part}>{part}</option>
+              <option key={part} value={part}>
+                {partOfSpeechLabels[part]}
+              </option>
             ))}
           </select>
         </label>
         <label>
-          Synonyms (optional, comma separated)
+          Từ đồng nghĩa (không bắt buộc, cách nhau bằng dấu phẩy)
           <input
             name="synonyms"
             value={form.synonyms}
@@ -174,7 +214,7 @@ export default function AddWordForm({
           />
         </label>
         <label>
-          Antonyms (optional, comma separated)
+          Từ trái nghĩa (không bắt buộc, cách nhau bằng dấu phẩy)
           <input
             name="antonyms"
             value={form.antonyms}
@@ -192,7 +232,7 @@ export default function AddWordForm({
           disabled={saving}
           type="submit"
         >
-          {saving ? "Saving…" : "Save to my words"}
+          {saving ? "Đang lưu…" : "Lưu từ"}
           <Icon name="arrow" size={18} />
         </button>
       </form>

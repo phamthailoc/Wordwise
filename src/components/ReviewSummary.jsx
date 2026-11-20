@@ -6,41 +6,41 @@ export default function ReviewSummary({
 }) {
   return (
     <div className="review-summary">
-      <div className="summary-badge">ROUND {summary.round}</div>
+      <div className="summary-badge">LƯỢT {summary.round}</div>
       <div className="summary-count">
         {summary.studied}
-        <span> words reviewed</span>
+        <span> từ đã ôn</span>
       </div>
       <div className="summary-stats">
         <div>
           <b>{summary.known}</b>
-          <span>Known</span>
+          <span>Đã nhớ</span>
         </div>
         <div>
           <b>{summary.needsReview}</b>
-          <span>Need review</span>
+          <span>Cần ôn</span>
         </div>
       </div>
       {summary.needsReview > 0 ? (
         <>
-          <p>{summary.needsReview} words are ready for your next round.</p>
+          <p>{summary.needsReview} từ đã sẵn sàng cho lượt ôn tiếp theo.</p>
           <button
             className="primary-button form-submit"
             onClick={continueWithReviewCards}
           >
-            Continue with words to review <span>Round {round + 1}</span>
+            Ôn tiếp các từ chưa nhớ <span>Lượt {round + 1}</span>
           </button>
         </>
       ) : (
         <>
-          <p>Great work — every selected word is marked as known.</p>
+          <p>Bạn đã đánh dấu nhớ tất cả các từ trong lượt này.</p>
           <button className="primary-button form-submit" onClick={stopReview}>
-            Finish session
+            Hoàn tất
           </button>
         </>
       )}
       <button className="secondary-review-action" onClick={stopReview}>
-        Back to vocabulary
+        Về trang học tập
       </button>
     </div>
   );

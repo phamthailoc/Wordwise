@@ -261,65 +261,6 @@ td {
   background: #eef2ea;
   font-size: 24px;
 }
-.flashcard-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.flash-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex: 1;
-  color: #53634a;
-  font-size: 12px;
-  font-weight: 600;
-}
-.flashcard-header .modal-close {
-  position: static;
-  flex: 0 0 44px;
-}
-.flashcard {
-  text-align: center;
-}
-.flashcard h2 {
-  padding: 0;
-  font-size: 38px;
-  margin-top: 20px;
-  overflow-wrap: anywhere;
-}
-.flash-category {
-  color: #5d6858;
-  font-size: 14px;
-  margin-top: 28px;
-}
-.flashcard .flash-meaning {
-  font-size: 28px;
-}
-.flash-ornament {
-  display: none;
-}
-.flash-pronunciation {
-  color: #5d6858;
-}
-.flip-button {
-  color: #406333;
-  margin: 12px 0;
-}
-.flash-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  border-top: 1px solid #dce2d7;
-  margin-top: 24px;
-  padding-top: 16px;
-}
-.flash-actions button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 .related-words {
   text-align: left;
   display: grid;
@@ -367,6 +308,9 @@ td {
 .learning-mode-option > span {
   flex: 1;
 }
+.learning-mode-option svg {
+  flex-shrink: 0;
+}
 .learning-mode-option b,
 .learning-mode-option small {
   display: block;
@@ -374,8 +318,35 @@ td {
 .learning-mode-option b {
   margin-bottom: 4px;
 }
-.learning-mode-option svg {
+.example-fields {
+  display: grid;
+  gap: 8px;
+}
+.example-fields > button {
+  justify-self: start;
+}
+.example-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.example-field input {
+  min-width: 0;
+  flex: 1;
+}
+.example-field button {
   flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.example-sentences {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
 }
 .word-form form {
   display: grid;
@@ -414,7 +385,6 @@ td {
 }
 .review-chip {
   font-size: 14px;
-  text-transform: capitalize;
 }
 .review-chip.selected {
   background: #e7efdf;
@@ -435,48 +405,114 @@ td {
   border: 1px solid #dce2d7;
   border-radius: 6px;
 }
-.review-count-select {
-  grid-column: 1 / -1;
-}
-.review-session-meta {
+.study-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin: 24px 0 8px;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding-right: 52px;
+  min-height: 32px;
+}
+.study-header h2 {
+  margin: 0;
+  padding: 0;
+}
+.study-header > span {
+  color: #5d6858;
   font-size: 14px;
+  white-space: nowrap;
 }
-.review-progress {
-  height: 4px;
-  background: #e4ebdd;
+/* Keep actions still; long answers scroll above them. */
+.study-dialog {
+  height: min(620px, 92dvh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
-.review-progress > div {
+.study-dialog .study-header {
+  flex-shrink: 0;
+}
+.review-session {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.review-flip-stage {
+  flex: 1;
+  min-height: 0;
+  perspective: 1000px;
+}
+.review-flip-inner {
+  position: relative;
   height: 100%;
-  background: #406333;
+  transform-style: preserve-3d;
+  transition: transform 450ms ease-in-out;
+}
+.review-flip-inner.is-flipped {
+  transform: rotateY(180deg);
 }
 .review-card-face {
+  position: absolute;
+  inset: 0;
   text-align: center;
-  padding: 24px 0;
+  padding: 16px 0 0;
+  background: white;
+  backface-visibility: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
 }
-.review-card-tags {
-  display: flex;
-  justify-content: space-between;
+.review-card-face.answer-face {
+  transform: rotateY(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .review-flip-inner {
+    transition: none;
+  }
+}
+.review-word-type {
   color: #5d6858;
   font-size: 14px;
+  margin-bottom: 12px;
+}
+.review-word-heading {
+  display: grid;
+  grid-template-columns: 44px minmax(0, auto) 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0 4px;
 }
 .review-word {
-  font-size: clamp(30px, 7vw, 44px);
+  grid-column: 2;
+  font-size: clamp(28px, 6vw, 36px);
   font-weight: 600;
-  margin: 40px 0 16px;
+  min-width: 0;
   overflow-wrap: anywhere;
 }
-.review-meaning {
-  font-size: 28px;
-  font-weight: 600;
-  margin-top: 24px;
+.speak-again {
+  grid-column: 3;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
 }
-.review-hint {
-  color: #5d6858;
-  font-size: 14px;
-  margin: 16px 0 0;
+.review-meaning {
+  font-size: 24px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.review-card-face .related-words {
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+}
+.review-card-face .review-example {
+  background: transparent;
+  border-top: 1px solid #dce2d7;
+  border-radius: 0;
+  padding: 12px 0 0;
+  overflow-wrap: anywhere;
 }
 .review-rating,
 .review-session-actions {
@@ -488,13 +524,19 @@ td {
 .review-rating button {
   flex: 1;
 }
+.review-rating {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex-shrink: 0;
+}
 .review-rating button:first-child {
   background: #406333;
   color: white;
 }
-.review-paused {
-  color: #8a542c;
-  text-align: center;
+.review-session-actions {
+  justify-content: center;
+  margin-top: 12px;
+  flex-shrink: 0;
 }
 .review-summary {
   text-align: center;
@@ -525,6 +567,34 @@ td {
 }
 
 /* 5. Small screens */
+.word-flow-setup {
+  display: grid;
+  gap: 20px;
+}
+.flow-word-list {
+  list-style: none;
+  margin: 20px 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.flow-word-list li {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #dce2d7;
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.flow-word-list li[aria-current="true"] {
+  background: #e7efdf;
+  border-color: #406333;
+  box-shadow: inset 4px 0 #406333;
+}
+.word-flow .review-summary > button {
+  margin: 6px;
+}
 .add-word-menu {
   position: relative;
 }
@@ -617,12 +687,5 @@ td {
   }
   .review-options-grid {
     grid-template-columns: 1fr;
-  }
-  .flashcard-header {
-    gap: 8px;
-  }
-  .flash-top {
-    font-size: 11px;
-    gap: 8px;
   }
 }

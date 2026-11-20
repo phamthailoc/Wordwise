@@ -3,6 +3,7 @@ import { getVocabulary } from "./api/vocabulary.js";
 import LearningModes from "./components/LearningModes.jsx";
 import Flashcard from "./components/Flashcard.jsx";
 import AutoReview from "./AutoReview.jsx";
+import WordFlow from "./WordFlow.jsx";
 import VocabularyPage from "./pages/VocabularyPage.jsx";
 import StatisticsPage from "./pages/StatisticsPage.jsx";
 
@@ -97,18 +98,18 @@ export default function App() {
           <>
             {page === "home" && (
               <section className="home-page">
-                <p className="eyebrow">TOEIC VOCABULARY</p>
+                <p className="eyebrow">GÓC HỌC TẬP</p>
                 <h1>Mỗi ngày, nhớ thêm một chút.</h1>
                 <p>
-                  Chọn Flashcards để tự ôn hoặc Auto Review để nghe và lật thẻ
-                  tự động.
+                  Chọn cách học phù hợp: Flashcards, Auto Review hoặc nghe theo
+                  nhóm với WordFlow.
                 </p>
                 <button
                   className="primary-button"
                   disabled={!words.length || !!error}
                   onClick={() => setMode("choose")}
                 >
-                  Start learning →
+                  Bắt đầu học →
                 </button>
                 {!words.length && !error && (
                   <p>Thêm từ trong trang Từ vựng để bắt đầu.</p>
@@ -116,10 +117,7 @@ export default function App() {
               </section>
             )}
             {page === "vocabulary" && (
-              <VocabularyPage
-                words={words}
-                onChange={() => loadWords()}
-              />
+              <VocabularyPage words={words} onChange={() => loadWords()} />
             )}
             {page === "statistics" && (
               <StatisticsPage words={words} knownIds={knownIds} />
@@ -133,6 +131,7 @@ export default function App() {
           onClose={() => setMode(null)}
           onChooseFlashcards={() => openFlashcards(words)}
           onChooseAutoReview={() => setMode("auto")}
+          onChooseWordFlow={() => setMode("flow")}
         />
       )}
       {mode === "flashcards" && (
@@ -140,7 +139,6 @@ export default function App() {
           words={manualWords}
           initialWord={initialWord}
           onClose={() => setMode(null)}
-          onMarkKnown={markKnown}
         />
       )}
       {mode === "auto" && (
@@ -149,6 +147,9 @@ export default function App() {
           onClose={() => setMode(null)}
           onMarkKnown={markKnown}
         />
+      )}
+      {mode === "flow" && (
+        <WordFlow words={words} onClose={() => setMode(null)} />
       )}
     </>
   );

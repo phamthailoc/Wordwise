@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS vocabulary (
   id BIGSERIAL PRIMARY KEY,
   word VARCHAR(100) NOT NULL UNIQUE,
   meaning VARCHAR(255) NOT NULL,
-  example TEXT NOT NULL,
   category VARCHAR(60) NOT NULL DEFAULT 'Office',
   part_of_speech VARCHAR(30) NOT NULL DEFAULT 'noun',
   related_words JSONB NOT NULL DEFAULT '{"synonyms": [], "antonyms": []}'::jsonb,
@@ -13,7 +12,16 @@ ALTER TABLE vocabulary
   ADD COLUMN IF NOT EXISTS part_of_speech VARCHAR(30) NOT NULL DEFAULT 'noun',
   ADD COLUMN IF NOT EXISTS related_words JSONB NOT NULL DEFAULT '{"synonyms": [], "antonyms": []}'::jsonb;
 
-INSERT INTO vocabulary (word, meaning, example, category, part_of_speech, related_words) VALUES
+CREATE TABLE IF NOT EXISTS vocabulary_examples (
+  id BIGSERIAL PRIMARY KEY,
+  vocabulary_id BIGINT NOT NULL REFERENCES vocabulary(id) ON DELETE CASCADE,
+  sentence TEXT NOT NULL CHECK (btrim(sentence) <> ''),
+  position INTEGER NOT NULL CHECK (position > 0),
+  UNIQUE (vocabulary_id, position)
+);
+
+WITH seed (word, meaning, sentence, category, part_of_speech, related_words) AS (
+  VALUES
   ('agenda', 'Chương trình nghị sự', 'Please review the agenda before the staff meeting.', 'Meetings', 'noun', '{"synonyms": ["schedule", "plan"], "antonyms": []}'),
   ('colleague', 'Đồng nghiệp', 'A colleague will help you prepare the client presentation.', 'Office', 'noun', '{"synonyms": ["coworker", "workmate"], "antonyms": []}'),
   ('confirm', 'Xác nhận', 'Please confirm your attendance by Thursday.', 'Office', 'verb', '{"synonyms": ["verify", "validate"], "antonyms": ["cancel"]}'),
@@ -44,4 +52,11 @@ INSERT INTO vocabulary (word, meaning, example, category, part_of_speech, relate
   ('qualify', 'Đủ điều kiện', 'Applicants must qualify for the position before applying.', 'Human Resources', 'verb', '{"synonyms": ["be eligible", "meet the requirements"], "antonyms": ["disqualify"]}'),
   ('renew', 'Gia hạn; làm mới', 'The company decided to renew its lease for another year.', 'Office', 'verb', '{"synonyms": ["extend", "revalidate"], "antonyms": ["cancel"]}'),
   ('efficient', 'Hiệu quả', 'The new filing system makes document searches more efficient.', 'Office', 'adjective', '{"synonyms": ["effective", "productive"], "antonyms": ["inefficient"]}')
-ON CONFLICT (word) DO NOTHING;
+), inserted AS (
+  INSERT INTO vocabulary (word, meaning, category, part_of_speech, related_words)
+  SELECT word, meaning, category, part_of_speech, related_words::jsonb FROM seed
+  ON CONFLICT (word) DO NOTHING
+  RETURNING id, word
+)
+INSERT INTO vocabulary_examples (vocabulary_id, sentence, position)
+SELECT inserted.id, seed.sentence, 1 FROM inserted JOIN seed USING (word);

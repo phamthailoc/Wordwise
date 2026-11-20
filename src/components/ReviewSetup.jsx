@@ -1,4 +1,8 @@
-import { partOfSpeechOptions } from "../constants/vocabulary.js";
+import {
+  partOfSpeechOptions,
+  partOfSpeechLabels,
+  categoryLabel,
+} from "../constants/vocabulary.js";
 import { isValidReviewTime } from "../utils/review.js";
 
 export default function ReviewSetup({
@@ -13,8 +17,6 @@ export default function ReviewSetup({
   setFrontSeconds,
   backSeconds,
   setBackSeconds,
-  cardLimit,
-  setCardLimit,
   setupError,
   speechSupported,
   startSelectedReview,
@@ -25,11 +27,11 @@ export default function ReviewSetup({
   return (
     <div className="review-setup">
       <p className="review-lead">
-        Choose categories and word types, then set the card timing.
+        Chọn chủ đề, loại từ và thời gian hiển thị thẻ.
       </p>
       <div className="review-setting-group">
         <div className="review-setting-title">
-          <b>Categories</b>
+          <b>Chủ đề</b>
           <button
             type="button"
             onClick={() =>
@@ -41,8 +43,8 @@ export default function ReviewSetup({
             }
           >
             {selectedTopics.length === availableTopics.length
-              ? "Clear all"
-              : "Select all"}
+              ? "Bỏ chọn tất cả"
+              : "Chọn tất cả"}
           </button>
         </div>
         <div className="review-chip-list">
@@ -58,16 +60,27 @@ export default function ReviewSetup({
               }
               onClick={() => toggleTopic(topic)}
             >
-              {topic}
+              {categoryLabel(topic)}
             </button>
           ))}
         </div>
       </div>
       <div className="review-setting-group">
         <div className="review-setting-title">
-          <b>Word types</b>
-          <button type="button" onClick={() => setSelectedParts(["all"])}>
-            All types
+          <b>Loại từ</b>
+          <button
+            type="button"
+            onClick={() =>
+              setSelectedParts(
+                selectedParts.length === partOfSpeechOptions.length
+                  ? []
+                  : partOfSpeechOptions,
+              )
+            }
+          >
+            {selectedParts.length === partOfSpeechOptions.length
+              ? "Bỏ chọn tất cả"
+              : "Chọn tất cả"}
           </button>
         </div>
         <div className="review-chip-list">
@@ -75,24 +88,22 @@ export default function ReviewSetup({
             <button
               type="button"
               key={value}
-              aria-pressed={
-                selectedParts.includes("all") || selectedParts.includes(value)
-              }
+              aria-pressed={selectedParts.includes(value)}
               className={
-                selectedParts.includes("all") || selectedParts.includes(value)
+                selectedParts.includes(value)
                   ? "review-chip selected"
                   : "review-chip"
               }
               onClick={() => togglePart(value)}
             >
-              {value}
+              {partOfSpeechLabels[value]}
             </button>
           ))}
         </div>
       </div>
       <div className="review-options-grid">
         <label>
-          Show word before flipping (seconds)
+          Thời gian trước khi lật thẻ (giây)
           <input
             type="number"
             min="0"
@@ -104,7 +115,7 @@ export default function ReviewSetup({
           />
         </label>
         <label>
-          Review answer before next (seconds)
+          Thời gian xem nghĩa (giây)
           <input
             type="number"
             min="0"
@@ -115,22 +126,7 @@ export default function ReviewSetup({
             onChange={(event) => setBackSeconds(event.target.value)}
           />
         </label>
-        <label className="review-count-select">
-          Cards in the first round
-          <select
-            value={cardLimit}
-            onChange={(event) => setCardLimit(event.target.value)}
-          >
-            <option value="all">All matching words</option>
-            <option value="10">10 words</option>
-            <option value="20">20 words</option>
-          </select>
-        </label>
       </div>
-      <p className="muted">
-        Nhập số giây tùy chọn, ví dụ 2.5, 30 hoặc 120. Thời gian bắt đầu khi mặt
-        thẻ xuất hiện.
-      </p>
       {!validTime && (
         <p className="form-error" role="alert">
           Nhập số giây lớn hơn 0 cho cả hai mặt thẻ (tối đa khoảng 24 ngày).
@@ -139,7 +135,7 @@ export default function ReviewSetup({
       {setupError && <div className="form-error">{setupError}</div>}
       {!speechSupported && (
         <p className="speech-note">
-          This browser does not support automatic pronunciation.
+          Trình duyệt này chưa hỗ trợ phát âm tự động.
         </p>
       )}
       <button
@@ -147,13 +143,7 @@ export default function ReviewSetup({
         onClick={startSelectedReview}
         disabled={matchingWords.length === 0 || !validTime}
       >
-        Start review{" "}
-        <span>
-          {cardLimit === "all"
-            ? matchingWords.length
-            : Math.min(matchingWords.length, Number(cardLimit))}{" "}
-          words
-        </span>
+        Bắt đầu ôn <span>{matchingWords.length} từ</span>
       </button>
     </div>
   );
