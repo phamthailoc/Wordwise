@@ -138,7 +138,6 @@ export default function App() {
         <Flashcard
           words={manualWords}
           initialWord={initialWord}
-          onMarkKnown={markKnown}
           onClose={() => setMode(null)}
         />
       )}

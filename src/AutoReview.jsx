@@ -180,7 +180,11 @@ function AutoReview({ words, onClose, onMarkKnown }) {
         : "Hoàn thành lượt ôn";
 
   return (
-    <Modal className="auto-review-dialog" title={title} onClose={stopReview}>
+    <Modal
+      className={`auto-review-dialog ${phase === "review" ? "study-dialog" : ""}`}
+      title={title}
+      onClose={stopReview}
+    >
       <button
         className="modal-close"
         onClick={stopReview}
@@ -188,7 +192,16 @@ function AutoReview({ words, onClose, onMarkKnown }) {
       >
         ×
       </button>
-      <h2>{title}</h2>
+      {phase === "review" ? (
+        <header className="study-header">
+          <h2>{title}</h2>
+          <span>
+            Lượt {round} · {index + 1}/{queue.length}
+          </span>
+        </header>
+      ) : (
+        <h2>{title}</h2>
+      )}
 
       {phase === "setup" && (
         <ReviewSetup
@@ -213,11 +226,6 @@ function AutoReview({ words, onClose, onMarkKnown }) {
       {phase === "review" && activeCard && (
         <ReviewSession
           activeCard={activeCard}
-          round={round}
-          index={index}
-          queue={queue}
-          speechSupported={speechSupported}
-          stopReview={stopReview}
           isFlipped={isFlipped}
           flipNow={flipNow}
           rateCard={rateCard}

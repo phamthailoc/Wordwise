@@ -1,16 +1,8 @@
-import { categoryLabel, partOfSpeechLabels } from "../constants/vocabulary.js";
-import ExampleSentences from "./ExampleSentences.jsx";
 import { useState } from "react";
-import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
-import RelatedWords from "./RelatedWords.jsx";
+import VocabularyCard from "./VocabularyCard.jsx";
 
-export default function Flashcard({
-  words,
-  initialWord,
-  onClose,
-  onMarkKnown,
-}) {
+export default function Flashcard({ words, initialWord, onClose }) {
   const [index, setIndex] = useState(() =>
     Math.max(
       0,
@@ -26,60 +18,28 @@ export default function Flashcard({
   }
 
   return (
-    <Modal className="flashcard" title="Flashcards" onClose={onClose}>
-      <header className="flashcard-header">
-        <div className="flash-top">
-          <span>FLASHCARDS</span>
-          <span>
-            {index + 1} / {words.length}
-          </span>
-        </div>
-        <button
-          className="modal-close"
-          onClick={onClose}
-          aria-label="Đóng thẻ từ"
-        >
-          <Icon name="close" />
-        </button>
+    <Modal className="study-dialog" title="Flashcards" onClose={onClose}>
+      <button
+        className="modal-close"
+        onClick={onClose}
+        aria-label="Đóng thẻ từ"
+      >
+        ×
+      </button>
+      <header className="study-header">
+        <h2>Flashcards</h2>
+        <span>
+          {index + 1}/{words.length}
+        </span>
       </header>
-      <div className="flash-ornament" aria-hidden="true">
-        ✳
-      </div>
-      <div className="flash-category">
-        {categoryLabel(word.category)} · {partOfSpeechLabels[word.partOfSpeech]}
-      </div>
-      {!isFlipped ? (
-        <>
-          <h2>{word.word}</h2>
-          <p className="flash-pronunciation">
-            Thử nhớ nghĩa trước khi xem đáp án.
-          </p>
-          <button className="flip-button" onClick={() => setIsFlipped(true)}>
-            Xem nghĩa ↗
+      <div className="review-session">
+        <VocabularyCard word={word} isFlipped={isFlipped} />
+        <div className="review-rating">
+          <button onClick={() => setIsFlipped((flipped) => !flipped)}>
+            {isFlipped ? "Xem lại từ" : "Xem nghĩa"}
           </button>
-        </>
-      ) : (
-        <>
-          <h2 className="flash-meaning">{word.meaning}</h2>
-          <RelatedWords relatedWords={word.relatedWords} />
-          <ExampleSentences examples={word.examples} className="example-box" />
-          <button className="flip-button" onClick={() => setIsFlipped(false)}>
-            Xem lại từ ↗
-          </button>
-        </>
-      )}
-      <div className="flash-actions">
-        <button
-          onClick={() => {
-            onMarkKnown(word.id);
-            nextWord();
-          }}
-        >
-          <Icon name="check" size={17} /> Đã nhớ
-        </button>
-        <button onClick={nextWord}>
-          Từ tiếp theo <Icon name="arrow" size={17} />
-        </button>
+          <button onClick={nextWord}>Từ tiếp theo</button>
+        </div>
       </div>
     </Modal>
   );
