@@ -1,44 +1,50 @@
-# Setup and data guide
+# Hướng dẫn thiết lập và dữ liệu
 
-[Back to README](../README.md)
+[Quay lại README](../README.md)
 
-## Existing databases
+## Thiết lập PostgreSQL bằng pgAdmin 4
 
-With dependencies installed and `.env` configured, run:
+1. Kết nối đến PostgreSQL đang chạy trên máy.
+2. Nhấp phải **Databases → Create → Database**, đặt tên `english_learning`.
+3. Chọn database vừa tạo, mở **Tools → Query Tool**.
+4. Mở file `database/schema.sql` trong Query Tool và chạy toàn bộ nội dung.
+5. Làm mới **Schemas → public → Tables** để thấy `vocabulary` và `vocabulary_examples`.
+6. Điền tài khoản, mật khẩu, host, port và tên database tương ứng vào `DATABASE_URL` trong `.env`.
 
-```sh
-npm run db:migrate:examples
+Nếu dùng dòng lệnh, cần có `createdb` và `psql` trong PATH:
+
+```powershell
+createdb -U postgres english_learning
+psql -U postgres -d english_learning -f database/schema.sql
 ```
 
-Migration `002_add_vocabulary_examples.sql` creates the child table, copies non-empty sentences from the old `example` column, and removes that column. It runs in a transaction and can be run again safely. Do not rerun migration 001: it is a historical reset of the original sample vocabulary.
+Thư mục `database` chỉ giữ một file thiết lập hiện tại: `schema.sql`. File tạo hai bảng và nạp 30 từ mẫu; chạy lại trên cấu trúc hiện tại không ghi đè dữ liệu có sẵn. Database của dự án đang dùng cấu trúc này có thể tiếp tục hoạt động.
 
-For a fresh database, run `database/schema.sql` instead. It creates both tables and inserts 30 sample words. Repeating it does not overwrite existing words.
+## Cấu trúc dữ liệu
 
-## Data model
-
-- `vocabulary`: word, Vietnamese meaning, category, part of speech, related words, and creation date.
-- `vocabulary_examples`: `id`, `vocabulary_id`, `sentence`, and `position`.
-- The foreign key uses `ON DELETE CASCADE`. Each word's example positions are unique.
-- API writes update the word and its sentences in one transaction; a failed write rolls back both.
-- Categories are text on each word. No separate categories table is used.
+- `vocabulary`: từ tiếng Anh, nghĩa tiếng Việt, chủ đề, loại từ, nhóm đồng nghĩa/trái nghĩa và ngày tạo.
+- `vocabulary_examples`: `id`, `vocabulary_id`, `sentence` và `position`.
+- Quan hệ một–nhiều: mỗi từ có thể có nhiều câu ví dụ. `position` lưu thứ tự câu và không trùng trong cùng một từ.
+- Khóa ngoại dùng `ON DELETE CASCADE`: xóa từ thì xóa các ví dụ liên quan.
+- Thêm/sửa từ và các câu nằm trong một transaction; nếu lưu lỗi, toàn bộ thao tác được hoàn tác.
+- Chủ đề là chuỗi nằm trong bảng `vocabulary`, không có bảng chủ đề riêng.
 
 ## API
 
-| Method | Endpoint                                  | Purpose                                       |
-| ------ | ----------------------------------------- | --------------------------------------------- |
-| GET    | `/api/health`                             | Check whether the API is running              |
-| GET    | `/api/vocabulary?search=...&category=...` | List, search, and filter words                |
-| POST   | `/api/vocabulary`                         | Create a word                                 |
-| PUT    | `/api/vocabulary/:id`                     | Replace a word and its examples               |
-| DELETE | `/api/vocabulary/:id`                     | Delete a word and its examples                |
-| POST   | `/api/vocabulary/import`                  | Import a body containing `{ "words": [...] }` |
+| Phương thức | Đường dẫn                                 | Chức năng                                    |
+| ----------- | ----------------------------------------- | -------------------------------------------- |
+| GET         | `/api/health`                             | Kiểm tra backend đang chạy                   |
+| GET         | `/api/vocabulary?search=...&category=...` | Lấy danh sách, tìm kiếm và lọc từ            |
+| POST        | `/api/vocabulary`                         | Thêm từ                                      |
+| PUT         | `/api/vocabulary/:id`                     | Cập nhật từ và danh sách ví dụ               |
+| DELETE      | `/api/vocabulary/:id`                     | Xóa từ cùng các ví dụ                        |
+| POST        | `/api/vocabulary/import`                  | Nhập danh sách với body `{ "words": [...] }` |
 
-Create/update requests use `relatedWords: { "synonyms": [], "antonyms": [] }`.
-Import items use `synonyms` and `antonyms` directly as shown below.
+Khi thêm/sửa một từ, nhóm từ liên quan dùng `relatedWords: { "synonyms": [], "antonyms": [] }`. Trong danh sách import, dùng trực tiếp `synonyms` và `antonyms` như mẫu dưới đây.
 
-## JSON import
+## Mẫu nhập danh sách từ
 
-Choose the vocabulary page, open the add menu, and select list import. Paste a JSON array, preview it, and save the valid words.
+Tại trang **Từ vựng**, mở nút thêm từ và chọn **Nhập danh sách**. Dán mảng JSON, bấm **Xem trước**, rồi lưu các từ hợp lệ.
 
 ```json
 [
@@ -57,41 +63,42 @@ Choose the vocabulary page, open the add menu, and select list import. Paste a J
 ]
 ```
 
-Required: `word`, `meaning`, and `partOfSpeech` (`noun`, `verb`, `adjective`, `adverb`, or `phrase`).
-Optional: `category`, `examples`, `synonyms`, and `antonyms`. Missing or blank categories are stored as unclassified. New category names become available in filters after saving a word.
+- Bắt buộc: `word`, `meaning`, `partOfSpeech`.
+- Giá trị loại từ: `noun`, `verb`, `adjective`, `adverb`, `phrase`.
+- Không bắt buộc: `category`, `examples`, `synonyms`, `antonyms`.
+- Chủ đề thiếu hoặc trống được lưu là **Chưa phân loại**. Chủ đề mới xuất hiện trong bộ lọc sau khi lưu từ.
+- `examples` là mảng chuỗi. Câu trống được bỏ qua; các câu còn lại giữ nguyên thứ tự. Không có ví dụ thì dùng `[]`.
 
-Only `examples` is supported; the old `example` input is rejected. Examples must be an array of strings. Blank sentences are removed and order is preserved. No examples means `[]`.
+Mỗi lượt nhận 1–100 từ, body tối đa 1 MB. Từ trùng được so sánh không phân biệt hoa/thường và bỏ qua. Mục lỗi được báo trong bảng xem trước và không được lưu. Server kiểm tra lại khi lưu, nên kết quả có thể khác bản xem trước nếu dữ liệu đã thay đổi.
 
-Each import accepts 1-100 words and a request body up to 1 MB. Duplicates are compared without case sensitivity and skipped. Invalid items are reported and skipped. The server validates again when saving; the result may differ from the preview if the database changed in between.
+## Các chế độ học
 
-## Study modes
+- **Flashcards:** tự lật và tự chuyển từ; không đánh dấu đã nhớ.
+- **Auto Review:** trộn toàn bộ từ khớp bộ lọc; thời gian mặc định trước/sau khi lật là 3/6 giây. Từ chưa đánh dấu hoặc chọn cần ôn sẽ vào lượt tiếp theo. App chờ người học bấm ôn tiếp. Tạm dừng giữ thời gian còn lại.
+- **WordFlow:** trộn từ khớp bộ lọc; số từ mỗi nhóm mặc định là 6, cho nhập số nguyên dương. Tốc độ có sẵn: 0.5×, 0.75×, 0.9×, 1×, 1.25×, 1.5×, 2×. Đọc xong mới sang từ tiếp; hết nhóm chuyển ngay, hết danh sách tự dừng. Tiếp tục sau khi tạm dừng sẽ đọc lại từ hiện tại. Không cập nhật số từ đã nhớ.
 
-- **Flashcards:** flip manually and advance manually. No remembered-word rating.
-- **Auto Review:** all matching words are shuffled. Default front/back durations are 3/6 seconds. Mark a word as remembered or needing review. Unrated words enter the next round; the next round waits for the learner to start it. Pause preserves remaining time.
-- **WordFlow:** all matching words are shuffled. Default group size is 6; any positive whole number is allowed. Available rates are 0.5, 0.75, 0.9, 1, 1.25, 1.5, and 2. Speech `onend` advances the current word; the next group starts immediately. Resume replays the current word. WordFlow does not record remembered words.
+Giao diện dùng tiếng Việt; giữ tên sản phẩm và chế độ học bằng tiếng Anh. Việc dịch nhãn chủ đề/loại từ không thay đổi giá trị lưu trong database.
 
-The interface is Vietnamese; product and mode names stay in English. Display labels for categories and word types do not change the stored values.
+## Cách đọc code
 
-## Read the code
+1. `src/App.jsx`: dữ liệu chung, điều hướng và chọn chế độ học.
+2. `src/pages/VocabularyPage.jsx`: tìm kiếm, lọc và các thao tác thêm/sửa/xóa.
+3. `src/api/vocabulary.js` → `server/routes/` → `server/controllers/` → `server/models/`: luồng yêu cầu và lưu dữ liệu.
+4. `src/components/VocabularyCard.jsx`: hai mặt thẻ và hiệu ứng xoay dùng chung.
+5. `src/AutoReview.jsx`, `src/WordFlow.jsx`: điều khiển thời gian và phát âm.
+6. `src/utils/review.js`: trộn danh sách, kiểm tra thời gian và đọc từ.
 
-1. `src/App.jsx`: shared data, page navigation, and mode selection.
-2. `src/pages/VocabularyPage.jsx`: search, filters, and CRUD dialogs.
-3. `src/api/vocabulary.js` -> `server/routes/` -> `server/controllers/` -> `server/models/`: request flow and persistence.
-4. `src/components/VocabularyCard.jsx`: shared front/back presentation and rotation, without study scheduling.
-5. `src/AutoReview.jsx` and `src/WordFlow.jsx`: timing and speech coordination.
-6. `src/utils/review.js`: shuffling, review-time validation, and pronunciation.
+Phát âm dùng `SpeechSynthesisUtterance` và `speechSynthesis.speak()`, không lưu file âm thanh trong PostgreSQL. Trong Auto Review, giọng đọc và bộ đếm thời gian chạy độc lập; lật thẻ sẽ dừng tiếng đọc hiện tại. WordFlow đợi sự kiện đọc xong rồi mới chuyển từ.
 
-Speech uses `SpeechSynthesisUtterance` and `speechSynthesis.speak()`. No audio files are stored in PostgreSQL. In Auto Review, speech and the card timer are independent: flipping cancels the current pronunciation. WordFlow waits for pronunciation to finish instead.
+## Danh sách kiểm tra thủ công
 
-## Verification checklist
-
-- Create a word with three examples; find it and reveal its meaning.
-- Reload and reopen edit: all examples remain in order.
-- Delete one example, save, and check the two remaining sentences.
-- Import multiple examples; verify duplicate skipping and invalid-field errors.
-- Delete the word and check that no linked examples remain.
-- Try Flashcards flip/back/next; verify stable button positions.
-- Try Auto Review pause/resume and a repeat round.
-- Try WordFlow pause/resume and completion after the final group.
-- Check a 390px viewport, keyboard focus, and the close button.
-- Run `npm run build`.
+- Thêm từ với ba ví dụ, tìm từ và xem nghĩa.
+- Tải lại, mở sửa và kiểm tra ví dụ còn đủ, đúng thứ tự.
+- Xóa một câu, lưu và kiểm tra hai câu còn lại.
+- Import nhiều ví dụ; kiểm tra từ trùng và dữ liệu sai.
+- Xóa từ và kiểm tra các ví dụ liên quan đã được xóa.
+- Thử lật/xem lại/chuyển từ trong Flashcards, kiểm tra vị trí nút.
+- Thử tạm dừng, tiếp tục và ôn lại trong Auto Review.
+- Thử phát âm, tạm dừng và kết thúc danh sách trong WordFlow.
+- Kiểm tra màn hình 390px, phím Tab và nút đóng.
+- Chạy `npm run build`.
