@@ -1,3 +1,5 @@
+import { normalizeExamples } from "./vocabularyExamples.js";
+
 // Used by both preview and server validation so they follow the same rules.
 export const MAX_IMPORT_WORDS = 100;
 const wordTypes = ["noun", "verb", "adjective", "adverb", "phrase"];
@@ -49,8 +51,12 @@ export function prepareImport(words, existingWords = []) {
         message:
           "partOfSpeech phải là noun, verb, adjective, adverb hoặc phrase.",
       };
-    if (item.example !== undefined && typeof item.example !== "string")
-      return { ...row, message: "example phải là chuỗi văn bản." };
+    let examples;
+    try {
+      examples = normalizeExamples(item);
+    } catch (error) {
+      return { ...row, message: error.message };
+    }
     for (const field of ["synonyms", "antonyms"]) {
       if (
         item[field] !== undefined &&
@@ -77,7 +83,7 @@ export function prepareImport(words, existingWords = []) {
         meaning: item.meaning.trim(),
         partOfSpeech: item.partOfSpeech,
         category,
-        example: (item.example || "").trim(),
+        examples,
         relatedWords: {
           synonyms: (item.synonyms || [])
             .map((word) => word.trim())

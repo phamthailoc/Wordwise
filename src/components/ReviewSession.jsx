@@ -1,3 +1,4 @@
+import ExampleSentences from "./ExampleSentences.jsx";
 import RelatedWords from "./RelatedWords.jsx";
 import { speakWord } from "../utils/review.js";
 
@@ -60,12 +61,7 @@ export default function ReviewSession({
           <>
             <div className="review-meaning">{activeCard.meaning}</div>
             <RelatedWords relatedWords={activeCard.relatedWords} />
-            {activeCard.example && (
-              <div className="review-example">
-                <span>EXAMPLE</span>
-                <p>“{activeCard.example}”</p>
-              </div>
-            )}
+            <ExampleSentences examples={activeCard.examples} className="review-example" />
             <div className="review-rating">
               <button onClick={() => rateCard("known")}>✓ I knew it</button>
               <button onClick={() => rateCard("again")}>↻ Review again</button>

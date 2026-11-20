@@ -1,3 +1,4 @@
+import ExampleSentences from "./ExampleSentences.jsx";
 import { useState } from "react";
 import Icon from "./Icon.jsx";
 import Modal from "./Modal.jsx";
@@ -60,12 +61,7 @@ export default function Flashcard({
         <>
           <h2 className="flash-meaning">{word.meaning}</h2>
           <RelatedWords relatedWords={word.relatedWords} />
-          {word.example && (
-            <div className="example-box">
-              <span>IN A SENTENCE</span>
-              <p>“{word.example}”</p>
-            </div>
-          )}
+          <ExampleSentences examples={word.examples} className="example-box" />
           <button className="flip-button" onClick={() => setIsFlipped(false)}>
             Show the word again ↗
           </button>

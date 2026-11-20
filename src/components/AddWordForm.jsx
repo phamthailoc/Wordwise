@@ -20,7 +20,7 @@ export default function AddWordForm({
   const [form, setForm] = useState({
     word: initialWord?.word || "",
     meaning: initialWord?.meaning || "",
-    example: initialWord?.example || "",
+    examples: initialWord?.examples?.length ? initialWord.examples : [""],
     category: initialWord?.category || "",
     partOfSpeech: initialWord?.partOfSpeech || "noun",
     synonyms: initialWord?.relatedWords?.synonyms?.join(", ") || "",
@@ -51,7 +51,7 @@ export default function AddWordForm({
       const payload = {
         word: form.word,
         meaning: form.meaning,
-        example: form.example,
+        examples: form.examples.map((text) => text.trim()).filter(Boolean),
         category: form.category,
         partOfSpeech: form.partOfSpeech,
         relatedWords: {
@@ -106,15 +106,48 @@ export default function AddWordForm({
             placeholder="e.g. mua hàng"
           />
         </label>
-        <label>
-          Example sentence (optional)
-          <input
-            name="example"
-            value={form.example}
-            onChange={updateField}
-            placeholder="A sentence that brings it to life..."
-          />
-        </label>
+        <div className="example-fields">
+          <span>Câu ví dụ (không bắt buộc)</span>
+          {form.examples.map((sentence, index) => (
+            <div className="example-field" key={index}>
+              <input
+                aria-label={`Câu ví dụ ${index + 1}`}
+                value={sentence}
+                onChange={(event) =>
+                  setForm({
+                    ...form,
+                    examples: form.examples.map((text, position) =>
+                      position === index ? event.target.value : text,
+                    ),
+                  })
+                }
+                placeholder="Nhập câu ví dụ tiếng Anh…"
+              />
+              <button
+                type="button"
+                aria-label={`Xóa ví dụ ${index + 1}`}
+                onClick={() =>
+                  setForm({
+                    ...form,
+                    examples: form.examples.filter(
+                      (_, position) => position !== index,
+                    ),
+                  })
+                }
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setForm({ ...form, examples: [...form.examples, ""] })
+            }
+          >
+            + Thêm ví dụ
+          </button>
+        </div>
         <label>
           Category (optional)
           <select

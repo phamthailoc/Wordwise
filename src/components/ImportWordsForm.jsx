@@ -13,7 +13,7 @@ const sample = JSON.stringify(
       meaning: "mua",
       partOfSpeech: "verb",
       category: "Office",
-      example: "The company plans to purchase new computers.",
+      examples: ["The company plans to purchase new computers.", "You can purchase tickets online."],
       synonyms: ["buy", "acquire"],
       antonyms: ["sell"],
     },
@@ -113,7 +113,7 @@ export default function ImportWordsForm({ existingWords, onClose, onSave }) {
               Tối đa {MAX_IMPORT_WORDS} từ mỗi lượt. Từ trùng được bỏ qua, không ghi đè dữ liệu cũ.
             </p>
             <p>
-              Bắt buộc: word, meaning, partOfSpeech. Optional: category, example, synonyms, antonyms.
+              Bắt buộc: word, meaning, partOfSpeech. Optional: category, examples, synonyms, antonyms.
             </p>
             <p>
               Mỗi từ dùng category trong JSON. Category mới được lưu cùng từ; bỏ trống thì dùng Chưa phân loại.

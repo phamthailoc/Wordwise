@@ -1,3 +1,4 @@
+import { normalizeExamples } from "../../shared/vocabularyExamples.js";
 import * as vocabularyModel from "../models/vocabularyModel.js";
 import { prepareImport } from "../../shared/vocabularyImport.js";
 
@@ -46,7 +47,6 @@ async function saveVocabulary(request, response, next, id = null) {
   const {
     word,
     meaning,
-    example = "",
     category = "",
     partOfSpeech = "noun",
     relatedWords = {},
@@ -58,11 +58,16 @@ async function saveVocabulary(request, response, next, id = null) {
       .status(400)
       .json({ message: "Vui lòng nhập từ và nghĩa tiếng Việt." });
   }
+  let examples;
+  try {
+    examples = normalizeExamples(request.body);
+  } catch (error) {
+    return response.status(400).json({ message: error.message });
+  }
   const allowedParts = ["noun", "verb", "adjective", "adverb", "phrase"];
   if (
     word.trim().length > 100 ||
     meaning.trim().length > 255 ||
-    typeof example !== "string" ||
     (category != null &&
       (typeof category !== "string" || category.trim().length > 60)) ||
     !allowedParts.includes(partOfSpeech)
@@ -91,7 +96,7 @@ async function saveVocabulary(request, response, next, id = null) {
     const data = {
       word,
       meaning,
-      example,
+      examples,
       category: category?.trim() || "Chưa phân loại",
       partOfSpeech,
       relatedWords: {

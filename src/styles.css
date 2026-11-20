@@ -626,3 +626,34 @@ td {
     gap: 8px;
   }
 }
+
+.example-fields {
+  display: grid;
+  gap: 8px;
+}
+.example-fields > button {
+  justify-self: start;
+}
+.example-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.example-field input {
+  min-width: 0;
+  flex: 1;
+}
+.example-field button {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.example-sentences {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
